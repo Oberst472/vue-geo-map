@@ -1,7 +1,7 @@
 <template>
     <div class="page-main flex font-mono h-screen">
-      <SectionMap class="w-1/4 bg-teal-50 p-4"/>
-      <SectionAside class="bg-teal-100 w-full p-4"/>
+      <SectionAside class="w-1/4 bg-teal-50 p-4" @changeObj="changeObj" @lol="lol"/>
+      <SectionMap class="bg-teal-100 w-full" :items="state.info"/>
     </div>
 </template>
 
@@ -15,6 +15,18 @@ export default {
 <script setup lang="ts">
 import SectionMap from '../../sections/map/index.vue'
 import SectionAside from '../../sections/aside/index.vue'
+import { reactive } from 'vue';
+const state = reactive({
+  info: []
+})
+const changeObj = function (info) {
+  console.log(88);
+  console.log(info);
+  state.info = info
+}
+function lol() {
+  console.log(9);
+}
 </script>
 
 <style lang="scss">

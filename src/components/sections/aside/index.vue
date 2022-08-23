@@ -1,5 +1,7 @@
 <template>
-    <section class="section-aside">aside</section>
+    <aside class="section-aside">
+      <BlockUpload @changeObj="emits('changeObj', $event)"/>
+    </aside>
 </template>
 
 
@@ -10,9 +12,7 @@ export default {
 </script>
 
 <script setup lang="ts">
+import BlockUpload from '../../blocks/upload/index.vue'
+const emits = defineEmits(['changeObj'])
 
 </script>
-
-<style lang="scss">
-
-</style>
