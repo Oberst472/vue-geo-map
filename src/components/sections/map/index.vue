@@ -1,102 +1,221 @@
+
 <template>
-    <section class="section-map relative">
-      <l-map
-          v-model="zoom"
-          v-model:zoom="zoom"
-          :center="[47.41322, -1.219482]"
-          @move="log('move')"
+  <section class="section-map relative">
+
+    <l-map
+        :zoom="state.zoom"
+        :options="{zoomControl: false}"
+        :center="state.center"
+    >
+      <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
+
+      <l-marker
+          class="map-item"
+          :lat-lng="[item['Широта БС (начало, А)'], item['Долгота БС (начало, А)']]"
+          v-for="(item, index) in mainStore.filteredItems"
       >
-        <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
+        <l-tooltip>
+          <div>
+            <div><span class="text-black-500">Время</span>: {{ item['Время подключения'] }}</div>
+            <div><span class="text-black-500">Широта</span>: {{ item['Широта БС (начало, А)'] }}</div>
+            <div><span class="text-black-500">Долгота</span>: {{ item['Долгота БС (начало, А)'] }}</div>
+          </div>
+        </l-tooltip>
+      </l-marker>
+    </l-map>
 
-        <l-marker :lat-lng="[item['Широта БС (начало, А)'], item['Долгота БС (начало, А)']]" @moveend="log('moveend')" v-for="item in modifiedItems">
-          <l-tooltip>
-            lol
-          </l-tooltip>
-        </l-marker>
+    <div v-if="mainStore.modifiedItems.length" class="section-map__controls absolute top-0 left-0 flex items-center py-2">
+      <UiBtn
+          class="section-map__btn w-6 flex rounded-full justify-center items-center h-full w-9 h-9"
+          @click="changeIndex('first')"
+          :disabled="mainStore.index === 0 || mainStore.index === -1"
+      >
+        {{ '<<' }}
+      </UiBtn>
 
-<!--        <l-marker :lat-lng="[50, 50]" @moveend="log('moveend')">-->
-<!--          <l-popup>-->
-<!--            lol-->
-<!--          </l-popup>-->
-<!--        </l-marker>-->
+      <UiBtn
+          class="section-map__btn w-6 flex rounded-full justify-center items-center ml-4 mr-6 h-full w-9 h-9"
+          @click="changeIndex('prev')"
+          :disabled="mainStore.index === 0 || mainStore.index === -1"
 
-        <!--        <l-marker :lat-lng="[47.41322, -1.219482]">-->
-        <!--          <l-icon :icon-url="iconUrl" :icon-size="iconSize" />-->
-        <!--        </l-marker>-->
-      </l-map>
-      <div class="section-map__controls absolute top-4 left-4 font-">
-        <button @click="changeIcon">New kitten icown</button>
+      >
+        {{ '<' }}
+      </UiBtn>
+
+      <div class="section-map__select">
+        <input
+            class="section-map__select-inp text-center appearance-none border border-primary rounded h-full py-2 px-3 focus:outline-none focus:shadow-outline"
+            id="text"
+            type="text"
+            placeholder="Введите время"
+            v-model="inpVal"
+        >
+        <div class="section-map__select-items mt-1" v-if="mainStore.modifiedItems?.length" tabindex="1">
+          <ul class="w-full rounded">
+            <li
+                class="py-2 px-4 text-center w-full border-b hover:bg-gray-100 border-gray-200 dark:border-gray-200"
+                @click="changeTime({time: '', ind: 0, isAll: true})"
+            >
+              Показать все
+            </li>
+            <li
+                class="py-2 px-4 text-center w-full hover:bg-gray-100 border-b border-gray-200 dark:border-gray-200"
+                v-for="(item, index) in mainStore.getItems"
+                :key="item?.msTime"
+                @click="changeTime({time: item?.time, ind: index, isAll: false})"
+            >
+              {{ item?.time }}
+            </li>
+          </ul>
+        </div>
       </div>
-    </section>
+
+      <UiBtn
+          class="section-map__btn w-6 flex rounded-full justify-center items-center h-full ml-6 w-9 h-9"
+          @click="changeIndex('next')"
+          :disabled="mainStore.index === mainStore.getItems.length - 1 || mainStore.index === mainStore.getItems.length - 1"
+
+      >
+        {{ '>' }}
+      </UiBtn>
+      <UiBtn
+          class="section-map__btn w-6 flex rounded-full justify-center items-center ml-4 mr-6 self-center w-9 h-9"
+          @click="changeIndex('last')"
+          :disabled="mainStore.index === mainStore.getItems.length - 1 || mainStore.index === mainStore.getItems.length - 1"
+
+      >
+        {{ '>>' }}
+      </UiBtn>
+
+    </div>
+  </section>
 </template>
 
-
 <script>
-import {
-  LMap,
-  LIcon,
-  LTileLayer,
-  LMarker,
-  LControlLayers,
-  LTooltip,
-  LPopup,
-  LPolyline,
-  LPolygon,
-  LRectangle,
-} from "@vue-leaflet/vue-leaflet";
-import "leaflet/dist/leaflet.css";
 export default {
-  name: 'SectionMap',
-  components: {
-    LMap,
-    LIcon,
-    LTileLayer,
-    LMarker,
-    LControlLayers,
-    LTooltip,
-    LPopup,
-    LPolyline,
-    LPolygon,
-    LRectangle,
-  },
-  props: {
-    items: {
-      type: Object,
-      default: () => []
-    }
-  },
-  data() {
-    return {
-      zoom: 2,
-      iconWidth: 25,
-      iconHeight: 40,
-    };
-  },
-  computed: {
-    iconUrl() {
-      return `https://placekitten.com/${this.iconWidth}/${this.iconHeight}`;
-    },
-    iconSize() {
-      return [this.iconWidth, this.iconHeight];
-    },
-    modifiedItems() {
-      const b = this.items.slice(0, 500).filter(item => item['Широта БС (начало, А)'] && item['Долгота БС (начало, А)'])
-      const lol = b.map(item => item['Широта БС (начало, А)'])
-      const b2 = [...new Set(lol)]
-      console.log(b2);
-      return b
-    }
-  },
-  methods: {
-    log(a) {
-      console.log(a);
-    },
-    changeIcon() {
-      this.iconWidth += 2;
-      if (this.iconWidth > this.iconHeight) {
-        this.iconWidth = Math.floor(this.iconHeight / 2);
-      }
-    },
-  },
+  name: 'SectionMap'
 }
 </script>
+
+
+<script setup>
+import {
+  LMap,
+  LTileLayer,
+  LMarker,
+  LTooltip,
+  // @ts-ignore
+} from '@vue-leaflet/vue-leaflet'
+import 'leaflet/dist/leaflet.css'
+import { MapIcon } from '@heroicons/vue/outline'
+import UiBtn from '../../ui/btn/index.vue'
+import { onMounted, reactive, ref, watch } from 'vue'
+import { useMainStore } from '../../../stores/main'
+
+const mainStore = useMainStore()
+
+const state = reactive({
+  center: [47.41322, -1.219482],
+  zoom: 5,
+  inputVal: '',
+  lol: ''
+})
+const inpVal = ref('')
+const changeIndex = function (val) {
+  mainStore.isAll = false
+  const max = mainStore.getItems.length - 1
+  if (val === 'first') return mainStore.index = 0
+  if (val === 'last') return mainStore.index = max
+
+  if (val === 'prev') {
+    if (mainStore.index === 0) return mainStore.index = 0
+    return mainStore.index = mainStore.index - 1
+  }
+
+  if (val === 'next') {
+    if (mainStore.index === max) return mainStore.index = max
+    return mainStore.index = mainStore.index + 1
+  }
+}
+const changeTime = function ({time, ind, isAll}) {
+  mainStore.isAll = isAll
+  mainStore.index = ind
+  inpVal.value = time
+}
+
+watch(() => mainStore.filteredItems, () => {
+  if (!mainStore.filteredItems.length) return
+  console.log(mainStore.filteredItems);
+  console.log(45);
+  if (String(state.center[0]) === '47.41322' && String(state.center[1]) === '-1.219482') {
+    state.center = [Number(mainStore.getItems[0]['Широта БС (начало, А)']), Number(mainStore.getItems[0]['Долгота БС (начало, А)'])]
+  }
+
+  if (mainStore.filteredItems.length === 1) {
+    console.log(77);
+    const item = mainStore.filteredItems[0]
+    inpVal.value = item.time
+    const s = Number(item['Широта БС (начало, А)'])
+    const d = Number(item['Долгота БС (начало, А)'])
+    if (s && d) {
+      state.center = [s, d]
+    }
+  }
+
+})
+
+onMounted(() => {
+  window.addEventListener('keydown', (e) => {
+    e.preventDefault()
+    if (!mainStore.modifiedItems.length) return
+    if (['ArrowUp', 'ArrowRight'].includes(e.key)) {
+      changeIndex('next')
+    }
+    if (['ArrowDown', 'ArrowLeft'].includes(e.key)) {
+      changeIndex('prev')
+    }
+  })
+})
+</script>
+
+<style>
+.section-map__controls {
+  background-color: rgba(255, 255, 255, 0.3);
+  z-index: 2000;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.section-map__select {
+  position: relative;
+}
+.section-map__select-inp:focus + .section-map__select-items  {
+  opacity: 1;
+  pointer-events: initial;
+}
+.section-map__select-items {
+  border-radius: 5px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  max-height: 200px;
+  background-color: #fff;
+  overflow-y: auto;
+  width: 100%;
+}
+.section-map__select-items > * {
+  cursor: pointer;
+}
+.section-map__select-items:focus {
+  opacity: 1;
+  pointer-events: initial;
+}
+
+.section-map__btn:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+</style>
