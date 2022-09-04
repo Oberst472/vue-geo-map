@@ -10,7 +10,13 @@ export const useMainStore = defineStore('main', {
         filteredTime: '',
         isAll: true,
         items: [],
-        modifiedItems: []
+        modifiedItems: [],
+        rowNames: {
+            time: '',
+            longitude: '',
+            latitude: ''
+        },
+        isRowNamesModified: false
     }),
     getters: {
         getItems: (state) => {
@@ -57,7 +63,12 @@ export const useMainStore = defineStore('main', {
             this.items = val
         },
         setCount(val = 1000) {
-            this.count = this.count + val
+            if (this.count + val <= this.items.length) {
+                this.count = this.count + val
+            }
+            else {
+                this.count = this.items.length
+            }
         },
         resetStore() {
             this.index = -1

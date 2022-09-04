@@ -5,16 +5,51 @@
                                                                                   успешно загружен
     </div>
 
-    <UiBtn
-        class="w-full mt-8 disabled py-2 px-2"
-        @click="showOnTheMap"
-        v-if="state.items.length"
-    >
-      Вывести данные на карту
-    </UiBtn>
-    <div class="mt-4" v-if="mainStore.getItems.length">Показано: {{ mainStore.getItems.length }} {{ text }} из
-                                                       {{ mainStore.items.length }}
+    <div v-if="!mainStore.isRowNamesModified">
+      <div>Редактировать название колонок</div>
+      <!--      <UiInput placeholder="Время" v-model:name="state.rowNames.time"/>-->
     </div>
+
+
+    <template v-else>
+      <div v-if="state.items.length && mainStore.count < state.items.length">
+        <UiBtn
+            class="w-full mt-8 disabled py-2 px-2"
+            @click="showOnTheMap(100)"
+        >
+          Добавить 100 маркеров
+        </UiBtn>
+        <UiBtn
+            class="w-full mt-8 disabled py-2 px-2"
+            @click="showOnTheMap(500)"
+        >
+          Добавить 500 маркеров
+        </UiBtn>
+        <UiBtn
+            class="w-full mt-8 disabled py-2 px-2"
+            @click="showOnTheMap(1000)"
+        >
+          Добавить 1000 маркеров
+        </UiBtn>
+        <UiBtn
+            class="w-full mt-8 disabled py-2 px-2"
+            @click="showOnTheMap(5000)"
+        >
+          Добавить 5000 маркеров
+        </UiBtn>
+      </div>
+
+      <div
+          class="mt-4"
+          v-if="(mainStore.getItems.length && mainStore.count < state.items.length)"
+      >
+        Показано:
+        {{ mainStore.getItems.length }} {{ text }} из {{ mainStore.items.length }}
+      </div>
+      <div v-if="mainStore.count !== 0 && mainStore.count === state.items.length && !mainStore.isLoading" class="mt-5 text-center">
+        Все элементы были выведены на карту!
+      </div>
+    </template>
   </aside>
 </template>
 
@@ -29,6 +64,7 @@ export default {
 // @ts-nocheck
 import BlockUpload from '../../blocks/upload/index.vue'
 import UiBtn from '../../ui/btn/index.vue'
+import UiInput from '../../ui/input/index.vue'
 import { useMainStore } from '../../../stores/main'
 import { computed, reactive, watch } from 'vue';
 
@@ -40,7 +76,12 @@ const state = reactive({
     'name': 'jayanth',
     'data': 'scd',
     'abc': 'sdef'
-  }]
+  }],
+  rowNames: {
+    time: '',
+    longitude: '',
+    latitude: ''
+  }
 })
 
 const saveFile = function (val: any) {
@@ -61,12 +102,17 @@ const text = computed(() => {
   return sk(mainStore.getItems.length, ['маркер', 'маркера', 'маркеров'])
 })
 
-const showOnTheMap = function () {
+const showOnTheMap = function (count: number) {
+  mainStore.changeLoading(true)
+
+  const tm = count > 1000 ? 4000 : 1000
+  mainStore.setCount(count)
   setTimeout(() => {
     mainStore.changeLoading(false)
-  }, 1000);
-  mainStore.setCount(100)
+  }, tm);
+  mainStore.setCount(count)
 }
+
 // @ts-ignore
 function getText(fileToRead) {
   var reader = new FileReader();
@@ -74,11 +120,13 @@ function getText(fileToRead) {
   reader.onload = loadHandler;
   // reader.onerror = errorHandler;
 }
+
 // @ts-ignore
 function loadHandler(event) {
   var csv = event.target.result;
   process(csv);
 }
+
 // @ts-ignore
 function process(csv) {
 
@@ -109,6 +157,7 @@ function process(csv) {
   console.log(result);
 
 }
+
 // @ts-ignore
 const convert = function (value) {
   // const val = getText(value)
@@ -123,6 +172,7 @@ const convert = function (value) {
       // @ts-ignore
       let data = e.target.result;
       console.log(data);
+      console.log(2);
       // @ts-ignore
       let workbook = XLSX.read(data, {type: 'binary'});
       workbook.SheetNames.forEach((sheet: any) => {

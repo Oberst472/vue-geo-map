@@ -1,7 +1,6 @@
 
 <template>
   <section class="section-map relative">
-
     <l-map
         :zoom="state.zoom"
         :options="{zoomControl: false}"
@@ -166,6 +165,7 @@ watch(() => mainStore.filteredItems, () => {
 
 onMounted(() => {
   window.addEventListener('keydown', (e) => {
+    console.log(88);
     e.preventDefault()
     if (!mainStore.modifiedItems.length) return
     if (['ArrowUp', 'ArrowRight'].includes(e.key)) {

@@ -3,8 +3,6 @@
     <div class="mt-1 relative rounded-md shadow-sm border">
       <input
           type="text"
-          name="price"
-          id="price"
           class="
             focus:ring-indigo-500
             focus:border-indigo-500
@@ -15,8 +13,9 @@
             sm:text-sm
             border-gray-400
             rounded-md"
-          placeholder="Введите время"
+          :placeholder="props.placeholder"
       />
+      <input type="text" class="text-color-black">
     </div>
   </div>
 </template>
@@ -25,6 +24,24 @@
 export default {
   name: 'UiInput'
 }
+</script>
+
+<script lang="ts" setup>
+import { defineProps, onMounted } from 'vue';
+
+const props = defineProps({
+  placeholder: {
+    type: String,
+    default: ''
+  },
+  name: {
+    type: String
+  }
+})
+const emits = defineEmits(['update:name'])
+onMounted(() => {
+  console.log(99);
+})
 </script>
 
 <style scoped lang="">

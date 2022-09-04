@@ -17,5 +17,8 @@ import { onMounted } from 'vue';
 // })
 </script>
 
-<style scoped>
+<style>
+a[title*="A JavaScript library for interactive maps"] {
+  display: none !important;
+}
 </style>
