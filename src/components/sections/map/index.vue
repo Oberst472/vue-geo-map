@@ -8,7 +8,6 @@
         animate
         zoom-animation
         duration="0.3"
-        @contentupdate="lol"
         :options="{zoomControl: false}"
         :center="state.center"
     >
@@ -53,7 +52,7 @@
             id="text"
             type="text"
             placeholder="Введите время"
-            @input="lol"
+            @input="onInput"
             v-model="inpVal"
         >
         <div class="section-map__select-items mt-1" v-if="mainStore.modifiedItems?.length" tabindex="1">
@@ -127,7 +126,6 @@ const state = reactive({
   center: [47.41322, -1.219482],
   zoom: 5,
   inputVal: '',
-  lol: ''
 })
 const inpVal = ref('')
 const changeIndex = function (val) {
@@ -155,7 +153,7 @@ const changeTime = function ({time, date, ind, isAll}) {
   inpVal.value = time.split('+')[0] || time
   if (state.zoom !== 15) state.zoom = 15
 }
-const lol = function (e) {
+const onInput = function (e) {
   if (e.target.value === '') {
     mainStore.isAll = true
     mainStore.inpValue = ''
