@@ -179,13 +179,14 @@ onMounted(() => {
 
 <style>
 .section-map__controls {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.6);
   z-index: 2000;
   width: 100%;
   height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 .section-map__select {
   position: relative;
