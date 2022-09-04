@@ -1,13 +1,18 @@
-
 <template>
   <section class="section-map relative">
     <l-map
+        ref="map"
         :zoom="state.zoom"
+        max-zoom="18"
+        min-zoom="5"
+        animate
+        zoom-animation
+        duration="0.3"
+        @contentupdate="lol"
         :options="{zoomControl: false}"
         :center="state.center"
     >
       <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
-
       <l-marker
           class="map-item"
           :lat-lng="[item['Широта БС (начало, А)'], item['Долгота БС (начало, А)']]"
@@ -22,6 +27,7 @@
         </l-tooltip>
       </l-marker>
     </l-map>
+
 
     <div v-if="mainStore.modifiedItems.length" class="section-map__controls absolute top-0 left-0 flex items-center py-2">
       <UiBtn
@@ -87,6 +93,10 @@
         {{ '>>' }}
       </UiBtn>
 
+      <UiBtn class="section-map__center-btn rounded-full justify-center items-center ml-4 self-center px-2 h-9" @click="center">
+        Показать в центре
+      </UiBtn>
+
     </div>
   </section>
 </template>
@@ -107,10 +117,9 @@ import {
   // @ts-ignore
 } from '@vue-leaflet/vue-leaflet'
 import 'leaflet/dist/leaflet.css'
-import { MapIcon } from '@heroicons/vue/outline'
 import UiBtn from '../../ui/btn/index.vue'
-import { onMounted, reactive, ref, watch } from 'vue'
-import { useMainStore } from '../../../stores/main'
+import {onMounted, reactive, ref, watch} from 'vue'
+import {useMainStore} from '../../../stores/main'
 
 const mainStore = useMainStore()
 
@@ -137,6 +146,8 @@ const changeIndex = function (val) {
     return mainStore.index = mainStore.index + 1
   }
 }
+const map = ref(null)
+
 const changeTime = function ({time, date, ind, isAll}) {
   mainStore.isAll = isAll
   mainStore.inpValue = ''
@@ -152,14 +163,20 @@ const lol = function (e) {
   }
   mainStore.inpValue = e.target.value
   if (state.zoom !== 15) state.zoom = 15
+  // center()
+}
+const center = function () {
+  const coords = mainStore.getItems.map(item => [item['Широта БС (начало, А)'], item['Долгота БС (начало, А)']])
+  map.value.leafletObject.fitBounds(coords)
+  console.log(45);
 }
 
 
 watch(() => mainStore.filteredItems, () => {
   if (!mainStore.filteredItems?.length) return
-  if (String(state.center[0]) === '47.41322' && String(state.center[1]) === '-1.219482') {
-    state.center = [Number(mainStore.getItems[0]['Широта БС (начало, А)']), Number(mainStore.getItems[0]['Долгота БС (начало, А)'])]
-  }
+  // if (String(state.center[0]) === '47.41322' && String(state.center[1]) === '-1.219482') {
+  //   state.center = [Number(mainStore.getItems[0]['Широта БС (начало, А)']), Number(mainStore.getItems[0]['Долгота БС (начало, А)'])]
+  // }
 
   if (mainStore.filteredItems.length === 1) {
     const item = mainStore.filteredItems[0]
@@ -168,10 +185,16 @@ watch(() => mainStore.filteredItems, () => {
     const d = Number(item['Долгота БС (начало, А)'])
     if (s && d) {
       if (state.zoom !== 15) state.zoom = 15
-        state.center = [s, d]
+      center()
     }
   }
 
+})
+
+watch(() => mainStore.getItems, (val) => {
+  console.log(8);
+  if (!val.length) return
+  center()
 })
 
 onMounted(() => {
@@ -201,18 +224,22 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
 }
+
 .section-map__select {
   position: relative;
   width: 100%;
   max-width: 300px;
 }
+
 .section-map__select-inp:focus::placeholder {
   opacity: 0;
 }
-.section-map__select-inp:focus + .section-map__select-items  {
+
+.section-map__select-inp:focus + .section-map__select-items {
   opacity: 1;
   pointer-events: initial;
 }
+
 .section-map__select-items {
   border-radius: 5px;
   overflow: hidden;
@@ -224,9 +251,11 @@ onMounted(() => {
   overflow-y: auto;
   width: 100%;
 }
+
 .section-map__select-items > * {
   cursor: pointer;
 }
+
 .section-map__select-items:focus {
   opacity: 1;
   pointer-events: initial;
@@ -235,5 +264,10 @@ onMounted(() => {
 .section-map__btn:disabled {
   opacity: 0.5;
   pointer-events: none;
+}
+
+.section-map__center-btn {
+  position: absolute;
+  right: 15px;
 }
 </style>

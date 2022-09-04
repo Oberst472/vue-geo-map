@@ -10,7 +10,7 @@
             <UiInput placeholder="Время" v-model:name="state.rowNames.time" class="mb-2"/>
             <UiInput placeholder="Долгота" v-model:name="state.rowNames.longitude" class="mb-2"/>
             <UiInput placeholder="Широта" v-model:name="state.rowNames.latitude"/>
-      <UiBtn class="w-full mt-2 disabled py-2 px-2" @click="state.isRowNamesModifyActive = false">Изменить</UiBtn>
+      <UiBtn class="w-full mt-2 disabled py-2 px-2" @click="state.isRowNamesModifyActive = false">Посмотреть метки</UiBtn>
     </div>
 
 
@@ -111,55 +111,10 @@ const showOnTheMap = function (count: number) {
   mainStore.changeLoading(true)
 
   const tm = count > 1000 ? 4000 : 1000
-  mainStore.setCount(count)
   setTimeout(() => {
     mainStore.changeLoading(false)
   }, tm);
   mainStore.setCount(count)
-}
-
-// @ts-ignore
-function getText(fileToRead) {
-  var reader = new FileReader();
-  reader.readAsText(fileToRead);
-  reader.onload = loadHandler;
-  // reader.onerror = errorHandler;
-}
-
-// @ts-ignore
-function loadHandler(event) {
-  var csv = event.target.result;
-  process(csv);
-}
-
-// @ts-ignore
-function process(csv) {
-
-  // Newline split
-  var lines = csv.split('\n');
-
-  let result = [];
-
-  var headers = lines[0].split(',');
-
-  for (var i = 1; i < lines.length - 1; i++) {
-
-    var obj = {};
-
-    //Comma split
-    var currentline = lines[i].split(',');
-
-    for (var j = 0; j < headers.length; j++) {
-      // @ts-ignore
-      obj[headers[j]] = currentline[j];
-    }
-
-    result.push(obj);
-
-  }
-
-  // OUTPUT
-
 }
 
 // @ts-ignore
@@ -204,6 +159,7 @@ watch(() => state.items, () => {
 
 watch(() => mainStore.count, (newVal, oldVal) => {
   mainStore.modifiedItems = [...mainStore.modifiedItems, ...state.items.slice(oldVal, newVal)].filter(item => item['Широта БС (начало, А)'] && item['Долгота БС (начало, А)'])
+
 })
 
 </script>
