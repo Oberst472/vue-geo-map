@@ -168,7 +168,6 @@ const lol = function (e) {
 const center = function () {
   const coords = mainStore.getItems.map(item => [item['Широта БС (начало, А)'], item['Долгота БС (начало, А)']])
   map.value.leafletObject.fitBounds(coords)
-  console.log(45);
 }
 
 
@@ -192,7 +191,6 @@ watch(() => mainStore.filteredItems, () => {
 })
 
 watch(() => mainStore.getItems, (val) => {
-  console.log(8);
   if (!val.length) return
   center()
 })
