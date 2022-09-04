@@ -16,7 +16,6 @@ export const useMainStore = defineStore('main', {
             longitude: '',
             latitude: ''
         },
-        isRowNamesModified: false
     }),
     getters: {
         getItems: (state) => {

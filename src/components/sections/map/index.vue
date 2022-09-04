@@ -143,9 +143,7 @@ const changeTime = function ({time, ind, isAll}) {
 }
 
 watch(() => mainStore.filteredItems, () => {
-  if (!mainStore.filteredItems.length) return
-  console.log(mainStore.filteredItems);
-  console.log(45);
+  if (!mainStore.filteredItems?.length) return
   if (String(state.center[0]) === '47.41322' && String(state.center[1]) === '-1.219482') {
     state.center = [Number(mainStore.getItems[0]['Широта БС (начало, А)']), Number(mainStore.getItems[0]['Долгота БС (начало, А)'])]
   }
@@ -164,7 +162,8 @@ watch(() => mainStore.filteredItems, () => {
 })
 
 onMounted(() => {
-  window.addEventListener('keydown', (e) => {
+  const el = document.querySelector('.section-map')
+  el.addEventListener('keydown', (e) => {
     console.log(88);
     e.preventDefault()
     if (!mainStore.modifiedItems.length) return

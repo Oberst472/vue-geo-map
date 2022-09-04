@@ -1,13 +1,16 @@
 <template>
   <aside class="section-aside bg-white">
     <BlockUpload @downloadFile="saveFile"/>
-    <div v-if="mainStore.fileInfo" class="text-center text-xs mt-1 text-gray-400">Файл с именем {{ mainStore.fileInfo }}
-                                                                                  успешно загружен
+    <div v-if="mainStore.fileInfo" class="text-center text-xs mt-1 text-gray-400">
+      Файл с именем {{ mainStore.fileInfo }} успешно загружен
     </div>
 
-    <div v-if="!mainStore.isRowNamesModified">
-      <div>Редактировать название колонок</div>
-      <!--      <UiInput placeholder="Время" v-model:name="state.rowNames.time"/>-->
+    <div v-if="state.isRowNamesModifyActive" class="mt-5">
+      <div class="text-center">Редактировать название колонок (Необязательно)</div>
+            <UiInput placeholder="Время" v-model:name="state.rowNames.time" class="mb-2"/>
+            <UiInput placeholder="Долгота" v-model:name="state.rowNames.longitude" class="mb-2"/>
+            <UiInput placeholder="Широта" v-model:name="state.rowNames.latitude"/>
+      <UiBtn class="w-full mt-2 disabled py-2 px-2" @click="state.isRowNamesModifyActive = false">Изменить</UiBtn>
     </div>
 
 
@@ -81,7 +84,9 @@ const state = reactive({
     time: '',
     longitude: '',
     latitude: ''
-  }
+  },
+  isRowNamesModifyActive: false
+
 })
 
 const saveFile = function (val: any) {
@@ -187,9 +192,17 @@ const convert = function (value) {
 
 watch(() => state.items, () => {
   if (!state.items.length) return
-  console.log(66);
   mainStore.setItems(state.items)
   mainStore.changeLoading(false)
+  state.isRowNamesModifyActive = true
+  state.rowNames.time = 'Время подключения'
+  state.rowNames.longitude = 'Долгота БС (начало, А)'
+  state.rowNames.latitude = 'Широта БС (начало, А)'
+
+  mainStore.rowNames.time = 'Время подключения'
+  mainStore.rowNames.longitude = 'Долгота БС (начало, А)'
+  mainStore.rowNames.latitude = 'Широта БС (начало, А)'
+
 })
 
 watch(() => mainStore.count, (newVal, oldVal) => {

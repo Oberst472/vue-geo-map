@@ -14,8 +14,9 @@
             border-gray-400
             rounded-md"
           :placeholder="props.placeholder"
+          :value="props.name"
+          @input="emits('update:name', $event.target.value)"
       />
-      <input type="text" class="text-color-black">
     </div>
   </div>
 </template>
