@@ -1,3 +1,4 @@
+<!--ts-ignore-->
 <template>
   <div>
     <div class="mt-1 relative rounded-md shadow-sm border">
@@ -15,19 +16,19 @@
             rounded-md"
           :placeholder="props.placeholder"
           :value="props.name"
-          @input="emits('update:name', $event.target.value)"
+          @input="emits('update:name', $event?.target?.value)"
       />
     </div>
   </div>
 </template>
 
-<script lang="ts">
+<script>
 export default {
   name: 'UiInput'
 }
 </script>
 
-<script lang="ts" setup>
+<script setup>
 import { defineProps, onMounted } from 'vue';
 
 const props = defineProps({

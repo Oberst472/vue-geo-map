@@ -167,8 +167,8 @@ watch(() => mainStore.filteredItems, () => {
     const s = Number(item['Широта БС (начало, А)'])
     const d = Number(item['Долгота БС (начало, А)'])
     if (s && d) {
-      state.center = [s, d]
       if (state.zoom !== 15) state.zoom = 15
+        state.center = [s, d]
     }
   }
 
