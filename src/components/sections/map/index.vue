@@ -43,10 +43,11 @@
 
       <div class="section-map__select">
         <input
-            class="section-map__select-inp text-center appearance-none border border-primary rounded h-full py-2 px-3 focus:outline-none focus:shadow-outline"
+            class="section-map__select-inp text-center appearance-none border border-primary rounded h-full w-full py-2 px-3 focus:outline-none focus:shadow-outline"
             id="text"
             type="text"
             placeholder="Введите время"
+            @input="lol"
             v-model="inpVal"
         >
         <div class="section-map__select-items mt-1" v-if="mainStore.modifiedItems?.length" tabindex="1">
@@ -60,10 +61,10 @@
             <li
                 class="py-2 px-4 text-center w-full hover:bg-gray-100 border-b border-gray-200 dark:border-gray-200"
                 v-for="(item, index) in mainStore.getItems"
-                :key="item?.msTime"
-                @click="changeTime({time: item?.time, ind: index, isAll: false})"
+                :key="item['Время подключения']"
+                @click="changeTime({time: item['Время подключения'], ind: index, isAll: false})"
             >
-              {{ item?.time }}
+              {{ item['Время подключения'].split('+')[0] }}
             </li>
           </ul>
         </div>
@@ -136,11 +137,23 @@ const changeIndex = function (val) {
     return mainStore.index = mainStore.index + 1
   }
 }
-const changeTime = function ({time, ind, isAll}) {
+const changeTime = function ({time, date, ind, isAll}) {
   mainStore.isAll = isAll
+  mainStore.inpValue = ''
   mainStore.index = ind
-  inpVal.value = time
+  inpVal.value = time.split('+')[0] || time
+  if (state.zoom !== 15) state.zoom = 15
 }
+const lol = function (e) {
+  if (e.target.value === '') {
+    mainStore.isAll = true
+    mainStore.inpValue = ''
+    mainStore.index = 0
+  }
+  mainStore.inpValue = e.target.value
+  if (state.zoom !== 15) state.zoom = 15
+}
+
 
 watch(() => mainStore.filteredItems, () => {
   if (!mainStore.filteredItems?.length) return
@@ -149,13 +162,13 @@ watch(() => mainStore.filteredItems, () => {
   }
 
   if (mainStore.filteredItems.length === 1) {
-    console.log(77);
     const item = mainStore.filteredItems[0]
-    inpVal.value = item.time
+    inpVal.value = item['Время подключения'].split('+')[0] || item['Время подключения']
     const s = Number(item['Широта БС (начало, А)'])
     const d = Number(item['Долгота БС (начало, А)'])
     if (s && d) {
       state.center = [s, d]
+      if (state.zoom !== 15) state.zoom = 15
     }
   }
 
@@ -164,8 +177,9 @@ watch(() => mainStore.filteredItems, () => {
 onMounted(() => {
   const el = document.querySelector('.section-map')
   el.addEventListener('keydown', (e) => {
-    console.log(88);
-    e.preventDefault()
+    if (!e.target.classList.contains('section-map__select-inp')) {
+      e.preventDefault()
+    }
     if (!mainStore.modifiedItems.length) return
     if (['ArrowUp', 'ArrowRight'].includes(e.key)) {
       changeIndex('next')
@@ -186,10 +200,14 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
 }
 .section-map__select {
   position: relative;
+  width: 100%;
+  max-width: 300px;
+}
+.section-map__select-inp:focus::placeholder {
+  opacity: 0;
 }
 .section-map__select-inp:focus + .section-map__select-items  {
   opacity: 1;

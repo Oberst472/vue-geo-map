@@ -40,9 +40,6 @@ const props = defineProps({
   }
 })
 const emits = defineEmits(['update:name'])
-onMounted(() => {
-  console.log(99);
-})
 </script>
 
 <style scoped lang="">

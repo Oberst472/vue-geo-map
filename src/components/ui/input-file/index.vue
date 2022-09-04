@@ -77,7 +77,6 @@ function handleDrop(e) {
   let files = dt.files[0]
   state.isHoverActive = false
   downloadDrop(files)
-  console.log(files);
   // handleFiles(files)
 }
 </script>

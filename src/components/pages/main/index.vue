@@ -29,8 +29,6 @@ const state = reactive({
 })
 // @ts-ignore
 const changeObj = function (info) {
-  console.log(88);
-  console.log(info);
   state.info = info
 }
 </script>

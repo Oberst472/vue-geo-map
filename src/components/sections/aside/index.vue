@@ -159,7 +159,6 @@ function process(csv) {
   }
 
   // OUTPUT
-  console.log(result);
 
 }
 
@@ -176,8 +175,6 @@ const convert = function (value) {
     fileReader.onload = (e) => {
       // @ts-ignore
       let data = e.target.result;
-      console.log(data);
-      console.log(2);
       // @ts-ignore
       let workbook = XLSX.read(data, {type: 'binary'});
       workbook.SheetNames.forEach((sheet: any) => {
@@ -206,7 +203,7 @@ watch(() => state.items, () => {
 })
 
 watch(() => mainStore.count, (newVal, oldVal) => {
-  mainStore.modifiedItems = [...mainStore.modifiedItems, ...state.items.slice(oldVal, newVal)]
+  mainStore.modifiedItems = [...mainStore.modifiedItems, ...state.items.slice(oldVal, newVal)].filter(item => item['Широта БС (начало, А)'] && item['Долгота БС (начало, А)'])
 })
 
 </script>
