@@ -21,7 +21,10 @@ export const useMainStore = defineStore('main', {
     getters: {
         getItems: (state) => {
 //@ts-ignore
-            return state.modifiedItems.filter(item => item['Время подключения'].includes(state.inpValue))
+            const res = state.modifiedItems.filter(item => item['Время подключения'].includes(state.inpValue))
+            res.forEach(item => item.id = Math.random().toString(15)
+            )
+            return res
         },
         getIndex(state) {
             return state.index

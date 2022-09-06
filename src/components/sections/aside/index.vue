@@ -119,22 +119,12 @@ watch(() => state.items, () => {
   mainStore.setItems(state.items)
   mainStore.changeLoading(false)
   state.isRowNamesModifyActive = true
-  state.rowNames.time = 'Время подключения'
-  state.rowNames.longitude = 'Долгота БС (начало, А)'
-  state.rowNames.latitude = 'Широта БС (начало, А)'
-
-  mainStore.rowNames.time = 'Время подключения'
-  mainStore.rowNames.longitude = 'Долгота БС (начало, А)'
-  mainStore.rowNames.latitude = 'Широта БС (начало, А)'
-
 })
 
 watch(() => mainStore.count, (newVal, oldVal) => {
-  console.log(newVal);
-  console.log(oldVal);
-  // mainStore.modifiedItems = [...mainStore.modifiedItems, ...state.items.slice(oldVal, newVal)].filter(item => item['Широта БС (начало, А)'] && item['Долгота БС (начало, А)'])
-  mainStore.modifiedItems = [...state.items.slice(oldVal, newVal)].filter(item => item['Широта БС (начало, А)'] && item['Долгота БС (начало, А)'])
-
+  state.sign === '+' ?
+      mainStore.modifiedItems = [...state.items.slice(oldVal, newVal)].filter(item => item['Широта БС (начало, А)'] && item['Долгота БС (начало, А)']) :
+      mainStore.modifiedItems = [...state.items.slice(newVal, oldVal)].filter(item => item['Широта БС (начало, А)'] && item['Долгота БС (начало, А)'])
 })
 
 </script>

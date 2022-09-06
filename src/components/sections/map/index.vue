@@ -16,6 +16,7 @@
           class="map-item"
           :lat-lng="[item['Широта БС (начало, А)'], item['Долгота БС (начало, А)']]"
           v-for="(item, index) in mainStore.filteredItems"
+          :key="item.id"
       >
         <l-tooltip>
           <div>
