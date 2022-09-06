@@ -190,7 +190,9 @@ watch(() => mainStore.filteredItems, () => {
 
 watch(() => mainStore.getItems, (val) => {
   if (!val.length) return
-  center()
+  setTimeout(() => {
+    center()
+    }, 500);
 })
 
 onMounted(() => {

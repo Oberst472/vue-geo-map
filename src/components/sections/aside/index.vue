@@ -5,54 +5,23 @@
       Файл с именем {{ mainStore.fileInfo }} успешно загружен
     </div>
 
-    <div v-if="state.isRowNamesModifyActive" class="mt-5">
-      <div class="text-center">Редактировать название колонок (Необязательно)</div>
-            <UiInput placeholder="Время" v-model:name="state.rowNames.time" class="mb-2"/>
-            <UiInput placeholder="Долгота" v-model:name="state.rowNames.longitude" class="mb-2"/>
-            <UiInput placeholder="Широта" v-model:name="state.rowNames.latitude"/>
-      <UiBtn class="w-full mt-2 disabled py-2 px-2" @click="state.isRowNamesModifyActive = false">Посмотреть метки</UiBtn>
+    <BlockBtns
+        v-if="state.items.length"
+        @showOnTheMap="showOnTheMap"
+        :count="mainStore.count"
+        :items="state.items.length"
+    />
+
+    <div
+        class="mt-4"
+        v-if="(mainStore.getItems.length && mainStore.count < state.items.length)"
+    >
+      Показано:
+      {{ mainStore.getItems.length }} {{ text }} из {{ mainStore.items.length }}
     </div>
-
-
-    <template v-else>
-      <div v-if="state.items.length && mainStore.count < state.items.length">
-        <UiBtn
-            class="w-full mt-8 disabled py-2 px-2"
-            @click="showOnTheMap(100)"
-        >
-          Добавить 100 маркеров
-        </UiBtn>
-        <UiBtn
-            class="w-full mt-8 disabled py-2 px-2"
-            @click="showOnTheMap(500)"
-        >
-          Добавить 500 маркеров
-        </UiBtn>
-        <UiBtn
-            class="w-full mt-8 disabled py-2 px-2"
-            @click="showOnTheMap(1000)"
-        >
-          Добавить 1000 маркеров
-        </UiBtn>
-        <UiBtn
-            class="w-full mt-8 disabled py-2 px-2"
-            @click="showOnTheMap(5000)"
-        >
-          Добавить 5000 маркеров
-        </UiBtn>
-      </div>
-
-      <div
-          class="mt-4"
-          v-if="(mainStore.getItems.length && mainStore.count < state.items.length)"
-      >
-        Показано:
-        {{ mainStore.getItems.length }} {{ text }} из {{ mainStore.items.length }}
-      </div>
-      <div v-if="mainStore.count !== 0 && mainStore.count === state.items.length && !mainStore.isLoading" class="mt-5 text-center">
-        Все элементы были выведены на карту!
-      </div>
-    </template>
+    <div v-if="mainStore.count !== 0 && mainStore.count === state.items.length && !mainStore.isLoading" class="mt-5 text-center">
+      Все элементы были выведены на карту!
+    </div>
   </aside>
 </template>
 
@@ -66,6 +35,7 @@ export default {
 <script setup lang="ts">
 // @ts-nocheck
 import BlockUpload from '../../blocks/upload/index.vue'
+import BlockBtns from '../../blocks/btns/index.vue'
 import UiBtn from '../../ui/btn/index.vue'
 import UiInput from '../../ui/input/index.vue'
 import { useMainStore } from '../../../stores/main'
@@ -85,6 +55,7 @@ const state = reactive({
     longitude: '',
     latitude: ''
   },
+  sign: '',
   isRowNamesModifyActive: false
 
 })
@@ -107,14 +78,15 @@ const text = computed(() => {
   return sk(mainStore.getItems.length, ['маркер', 'маркера', 'маркеров'])
 })
 
-const showOnTheMap = function (count: number) {
+const showOnTheMap = function (payload: [string, number]) {
+  const [sign, count] = payload
+  state.sign = sign
   mainStore.changeLoading(true)
-
   const tm = count > 1000 ? 4000 : 1000
   setTimeout(() => {
     mainStore.changeLoading(false)
   }, tm);
-  mainStore.setCount(count)
+  mainStore.setCount(payload)
 }
 
 // @ts-ignore
@@ -158,7 +130,10 @@ watch(() => state.items, () => {
 })
 
 watch(() => mainStore.count, (newVal, oldVal) => {
-  mainStore.modifiedItems = [...mainStore.modifiedItems, ...state.items.slice(oldVal, newVal)].filter(item => item['Широта БС (начало, А)'] && item['Долгота БС (начало, А)'])
+  console.log(newVal);
+  console.log(oldVal);
+  // mainStore.modifiedItems = [...mainStore.modifiedItems, ...state.items.slice(oldVal, newVal)].filter(item => item['Широта БС (начало, А)'] && item['Долгота БС (начало, А)'])
+  mainStore.modifiedItems = [...state.items.slice(oldVal, newVal)].filter(item => item['Широта БС (начало, А)'] && item['Долгота БС (начало, А)'])
 
 })
 

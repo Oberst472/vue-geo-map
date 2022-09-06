@@ -41,9 +41,12 @@ export const useMainStore = defineStore('main', {
         setItems(val: any) {
             this.items = val
         },
-        setCount(val = 1000) {
-            if (this.count + val <= this.items.length) {
-                this.count = this.count + val
+        setCount(payload: [string, number]) {
+            const [sign, count] = payload
+            if (this.count + count <= this.items.length) {
+                sign === '+' ?
+                    this.count = this.count + count :
+                    this.count = this.count - count
             }
             else {
                 this.count = this.items.length
